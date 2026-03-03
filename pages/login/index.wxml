@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">欢迎使用健康管理助手</view>
+    <view class="muted">请先完成微信登录并同意相关协议。</view>
+
+    <checkbox-group bindchange="onAgreeChange" style="margin: 24rpx 0;">
+      <label><checkbox value="protocol" />我已阅读并同意《用户协议》《隐私政策》《免责声明》</label>
+    </checkbox-group>
+
+    <button class="btn-primary" bindtap="onLogin">微信授权登录</button>
+  </view>
+</view>

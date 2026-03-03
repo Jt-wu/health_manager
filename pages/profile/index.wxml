@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">档案</view>
+    <view>身高：{{profile.height || '-'}} cm</view>
+    <view>体重：{{profile.weight || '-'}} kg</view>
+    <view>主目标：{{profile.primaryGoal || '-'}}</view>
+    <button bindtap="goOnboarding" style="margin-top:12rpx;">编辑档案</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">指标录入</view>
+    <input placeholder="体重(kg)" value="{{metricValue}}" bindinput="onMetricInput" />
+    <button bindtap="saveWeight" style="margin-top:12rpx;">保存体重</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">Plus 订阅</view>
+    <view>{{plusStatus ? '已开通 Plus' : '未开通 Plus'}}</view>
+    <button bindtap="togglePlus" style="margin-top:12rpx;">{{plusStatus ? '取消（演示）' : '开通（演示）'}}</button>
+  </view>
+
+  <view class="card">
+    <view class="section-title">免责声明</view>
+    <view class="muted">本产品用于健康管理与饮食建议，不替代医疗诊断或治疗。如有不适或指标异常，请及时咨询医生/营养师。</view>
+  </view>
+</view>

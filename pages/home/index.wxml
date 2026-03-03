@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">今日概览</view>
+    <view>已记录餐次：{{todayMeals.length}}</view>
+    <view>估算热量：{{todayKcal}} kcal</view>
+    <view class="muted">主目标：{{primaryGoal || '未设置'}}</view>
+    <view class="muted" wx:if="{{todayMeals.length===0}}">拍一张包含多菜的照片，系统自动识别</view>
+  </view>
+
+  <button class="btn-primary" bindtap="goCapture">拍照记录</button>
+
+  <view class="card" style="margin-top:20rpx;">
+    <view class="section-title">今日餐次</view>
+    <view wx:for="{{todayMeals}}" wx:key="mealId" style="margin-top:10rpx;">
+      <view>{{item.mealType}} · {{item.summary.kcal}} kcal · {{item.conclusion}}</view>
+    </view>
+  </view>
+</view>
