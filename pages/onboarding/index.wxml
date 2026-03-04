@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">Step {{step}} / 4</view>
+
+    <block wx:if="{{step===1}}">
+      <input placeholder="身高(cm)" type="number" value="{{form.height}}" data-k="height" bindinput="onInput" />
+      <input placeholder="体重(kg)" type="number" value="{{form.weight}}" data-k="weight" bindinput="onInput" />
+      <picker mode="selector" range="{{sexOptions}}" bindchange="onSexChange"><view>性别：{{form.sex || '请选择'}}</view></picker>
+      <picker mode="selector" range="{{activityOptions}}" bindchange="onActivityChange"><view>运动水平：{{form.activity_level || '请选择'}}</view></picker>
+    </block>
+
+    <block wx:elif="{{step===2}}">
+      <view class="muted">至少选择一个目标，并选择一个主目标</view>
+      <checkbox-group bindchange="onGoalChange">
+        <label wx:for="{{goalOptions}}" wx:key="*this"><checkbox value="{{item}}" checked="{{form.goals.includes(item)}}"/>{{item}}</label>
+      </checkbox-group>
+      <picker mode="selector" range="{{form.goals}}" bindchange="onPrimaryGoalChange">
+        <view>主目标：{{form.primaryGoal || '请选择'}}</view>
+      </picker>
+    </block>
+
+    <block wx:elif="{{step===3}}">
+      <input placeholder="血压(可选)" value="{{form.bp}}" data-k="bp" bindinput="onInput" />
+      <input placeholder="尿酸(可选)" value="{{form.ua}}" data-k="ua" bindinput="onInput" />
+      <input placeholder="血脂(可选)" value="{{form.lipid}}" data-k="lipid" bindinput="onInput" />
+      <button bindtap="skipMetric">稍后补充</button>
+    </block>
+
+    <block wx:elif="{{step===4}}">
+      <input placeholder="过敏原（逗号分隔）" value="{{form.allergiesText}}" data-k="allergiesText" bindinput="onInput" />
+      <input placeholder="忌口（逗号分隔）" value="{{form.avoidFoodsText}}" data-k="avoidFoodsText" bindinput="onInput" />
+    </block>
+
+    <view style="margin-top: 20rpx; display:flex; gap: 16rpx;">
+      <button wx:if="{{step>1}}" bindtap="prev">上一步</button>
+      <button class="btn-primary" bindtap="next">{{step===4?'完成建档':'下一步'}}</button>
+    </view>
+  </view>
+</view>
