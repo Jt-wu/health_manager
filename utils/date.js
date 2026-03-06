@@ -7,7 +7,6 @@ function formatDate(date = new Date()) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
-
 function formatDateTime(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date)
   return `${formatDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
