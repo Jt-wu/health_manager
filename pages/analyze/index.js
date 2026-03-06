@@ -25,16 +25,14 @@ Page({
 
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
-    const viewData = this.normalizeAnalyzeResult(result)
-    this.setData({ ...viewData, mealType: mealType || this.data.mealType, loading: false })
-  },
-  normalizeAnalyzeResult(result = {}) {
     const dishes = (result.dishes || []).map((d) => ({ ...d, cookMethodIndex: this.getCookMethodIndex(d.cookMethod) }))
-    return {
+    this.setData({
       ...result,
       dishes,
-      confidencePercent: Math.round((result.confidence || 0) * 100)
-    }
+      mealType: mealType || this.data.mealType,
+      confidencePercent: Math.round((result.confidence || 0) * 100),
+      loading: false
+    })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
