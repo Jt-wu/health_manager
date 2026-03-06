@@ -4,6 +4,11 @@
     <view class="muted">可拍一张多菜，一次记录一餐</view>
     <button class="btn-primary" bindtap="chooseImage" style="margin-top:20rpx;">拍照/相册选择</button>
     <view wx:if="{{imageUrl}}" style="margin-top:16rpx;">已选择：{{imageUrl}}</view>
+
+    <picker mode="selector" range="{{mealTypes}}" value="{{mealTypeIndex}}" bindchange="onMealTypeChange" style="margin-top:16rpx;">
+      <view class="meal-type-picker">餐别：{{mealTypeIndex >= 0 ? mealTypes[mealTypeIndex] : '请选择（可选）'}}</view>
+    </picker>
+
     <button wx:if="{{imageUrl}}" bindtap="goAnalyze" style="margin-top:16rpx;">开始识别</button>
   </view>
 </view>

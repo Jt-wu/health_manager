@@ -1,0 +1,4 @@
+.container { padding: 24rpx; background: #f8fafc; min-height: 100vh; }
+.card { background: #fff; border-radius: 16rpx; padding: 24rpx; margin-bottom: 20rpx; }
+.section-title { font-weight: 600; margin-bottom: 12rpx; }
+.muted { color: #64748b; margin-top: 4rpx; }

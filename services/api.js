@@ -1,11 +1,52 @@
 const store = require('../utils/store')
 const { extractDate } = require('../utils/date')
 
+const VLM_ANALYZE_ENDPOINT = 'https://example.com/api/v1/vision/analyzeMeal'
+
 function fakeDelay(data, delay = 300) {
   return new Promise((resolve) => setTimeout(() => resolve(data), delay))
 }
 
 function analyzeMeal({ imageUrl, primaryGoal }) {
+  return analyzeMealByVisionModel({ imageUrl, primaryGoal }).catch(() => analyzeMealFallback({ imageUrl, primaryGoal }))
+}
+
+function analyzeMealByVisionModel({ imageUrl, primaryGoal }) {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: VLM_ANALYZE_ENDPOINT,
+      method: 'POST',
+      timeout: 12000,
+      data: {
+        imageUrl,
+        primaryGoal,
+        model: 'gpt-4.1-vision',
+        scene: 'meal_multi_dish'
+      },
+      success: (res) => {
+        const data = res.data || {}
+        if (res.statusCode >= 200 && res.statusCode < 300 && Array.isArray(data.dishes)) {
+          const dishes = data.dishes.map(normalizeDish)
+          const summary = data.summary || calcSummary(dishes)
+          resolve({
+            dishes,
+            summary,
+            conclusion: data.conclusion || buildConclusion(summary, primaryGoal),
+            advice: data.advice || buildAdvice(summary, primaryGoal),
+            confidence: data.confidence || 0,
+            imageUrl,
+            modelProvider: data.modelProvider || '视觉大模型'
+          })
+          return
+        }
+        reject(new Error('invalid_vlm_response'))
+      },
+      fail: reject
+    })
+  })
+}
+
+function analyzeMealFallback({ imageUrl, primaryGoal }) {
   const dishes = [
     { id: `d_${Date.now()}_1`, name: '西红柿炒蛋', cookMethod: '炒', baseGrams: 180, finalGrams: 180, adjustMethod: 'auto', confidence: 0.86, nutrition: { kcal: 220, sodium: 420, protein: 12 } },
     { id: `d_${Date.now()}_2`, name: '米饭', cookMethod: '蒸', baseGrams: 150, finalGrams: 150, adjustMethod: 'auto', confidence: 0.93, nutrition: { kcal: 170, sodium: 5, protein: 3 } }
@@ -15,7 +56,25 @@ function analyzeMeal({ imageUrl, primaryGoal }) {
   const conclusion = buildConclusion(summary, primaryGoal)
   const advice = buildAdvice(summary, primaryGoal)
 
-  return fakeDelay({ dishes, summary, conclusion, advice, confidence: 0.84, imageUrl }, 800)
+  return fakeDelay({ dishes, summary, conclusion, advice, confidence: 0.84, imageUrl, modelProvider: '本地兜底识别' }, 800)
+}
+
+function normalizeDish(d, index) {
+  const baseGrams = Number(d.baseGrams || d.finalGrams || 100)
+  return {
+    id: d.id || `d_${Date.now()}_${index}`,
+    name: d.name || '未命名菜品',
+    cookMethod: d.cookMethod || '未知',
+    baseGrams,
+    finalGrams: Number(d.finalGrams || baseGrams),
+    adjustMethod: d.adjustMethod || 'auto',
+    confidence: Number(d.confidence || 0),
+    nutrition: {
+      kcal: Number(d.nutrition?.kcal || 0),
+      sodium: Number(d.nutrition?.sodium || 0),
+      protein: Number(d.nutrition?.protein || 0)
+    }
+  }
 }
 
 function recalcMeal({ dishes, primaryGoal }) {

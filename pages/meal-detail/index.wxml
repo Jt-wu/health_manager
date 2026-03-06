@@ -1,0 +1,27 @@
+<view class="container" wx:if="{{meal}}">
+  <view class="card">
+    <view class="section-title">{{meal.mealType}} · {{meal.conclusion}}</view>
+    <view class="muted">{{meal.time}}</view>
+    <view style="margin-top:10rpx;">总热量：{{meal.summary.kcal}} kcal</view>
+    <view>钠：{{meal.summary.sodium}} mg</view>
+  </view>
+
+  <view class="card" wx:if="{{meal.imageUrl}}">
+    <view class="section-title">原始图片</view>
+    <image src="{{meal.imageUrl}}" mode="widthFix" style="width:100%;border-radius:16rpx;" />
+  </view>
+
+  <view class="card">
+    <view class="section-title">建议</view>
+    <view wx:for="{{meal.advice}}" wx:key="*this" class="muted">- {{item}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">菜品明细</view>
+    <view wx:for="{{meal.dishes}}" wx:key="id" style="border-bottom:1px solid #f1f5f9;padding:12rpx 0;">
+      <view>{{item.name}}（{{item.cookMethod}}）</view>
+      <view class="muted">份量：{{item.finalGrams}}g</view>
+      <view class="muted">热量：{{item.nutrition.kcal}} kcal · 钠：{{item.nutrition.sodium}} mg</view>
+    </view>
+  </view>
+</view>

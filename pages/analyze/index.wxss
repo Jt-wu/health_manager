@@ -1,0 +1,4 @@
+.dish-item { border-bottom: 1px solid #f1f5f9; padding: 12rpx 0; }
+.editor-label { font-size: 24rpx; color: #64748b; margin-bottom: 6rpx; }
+.dish-input { border: 1px solid #e2e8f0; border-radius: 10rpx; padding: 12rpx; }
+.cook-picker { border: 1px solid #e2e8f0; border-radius: 10rpx; padding: 12rpx; color: #334155; margin-bottom: 8rpx; }
