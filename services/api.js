@@ -77,7 +77,6 @@ function normalizeDish(d, index) {
   }
 }
 
-
 function recalcMeal({ dishes, primaryGoal }) {
   const summary = calcSummary(dishes)
   const conclusion = buildConclusion(summary, primaryGoal)
