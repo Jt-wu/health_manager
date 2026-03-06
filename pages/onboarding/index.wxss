@@ -5,4 +5,24 @@ input, picker view {
   padding: 16rpx;
   margin-top: 14rpx;
 }
-label { display:block; margin-top: 12rpx; }
+
+.goal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+  margin-top: 14rpx;
+}
+
+.goal-item {
+  padding: 10rpx 18rpx;
+  border-radius: 999rpx;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background: #fff;
+}
+
+.goal-item--active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}

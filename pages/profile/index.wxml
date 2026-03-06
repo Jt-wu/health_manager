@@ -3,14 +3,16 @@
     <view class="section-title">档案</view>
     <view>身高：{{profile.height || '-'}} cm</view>
     <view>体重：{{profile.weight || '-'}} kg</view>
+    <view>性别：{{profile.sex || '-'}}</view>
+    <view>运动水平：{{profile.activity_level || '-'}}</view>
+    <view>管理目标：{{(profile.goals && profile.goals.length) ? profile.goals.join('、') : '-'}}</view>
     <view>主目标：{{profile.primaryGoal || '-'}}</view>
+    <view>血压：{{profile.bp || '-'}}</view>
+    <view>尿酸：{{profile.ua || '-'}}</view>
+    <view>血脂：{{profile.lipid || '-'}}</view>
+    <view>过敏原：{{(profile.allergies && profile.allergies.length) ? profile.allergies.join('、') : '-'}}</view>
+    <view>忌口：{{(profile.avoid_foods && profile.avoid_foods.length) ? profile.avoid_foods.join('、') : '-'}}</view>
     <button bindtap="goOnboarding" style="margin-top:12rpx;">编辑档案</button>
-  </view>
-
-  <view class="card">
-    <view class="section-title">指标录入</view>
-    <input placeholder="体重(kg)" value="{{metricValue}}" bindinput="onMetricInput" />
-    <button bindtap="saveWeight" style="margin-top:12rpx;">保存体重</button>
   </view>
 
   <view class="card">
