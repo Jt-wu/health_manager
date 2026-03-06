@@ -1,4 +1,5 @@
 const store = require('../utils/store')
+const { getLocalDayKey } = require('../utils/date')
 
 function fakeDelay(data, delay = 300) {
   return new Promise((resolve) => setTimeout(() => resolve(data), delay))
@@ -30,13 +31,13 @@ function saveMeal({ meal }) {
 }
 
 function getDayLog(date) {
-  const meals = store.getMeals().filter((m) => (m.time || '').slice(0, 10) === date)
+  const meals = store.getMeals().filter((m) => getLocalDayKey(m.time) === date)
   return fakeDelay({ meals })
 }
 
 function getWeeklyReport({ week, primaryGoal }) {
   const meals = store.getMeals()
-  const days = new Set(meals.map((m) => (m.time || '').slice(0, 10)))
+  const days = new Set(meals.map((m) => getLocalDayKey(m.time)).filter(Boolean))
   const energyTargetRate = meals.length ? Math.min(100, Math.round(65 + meals.length * 3)) : 0
   const metrics = goalMetrics(primaryGoal, energyTargetRate)
   return fakeDelay({
