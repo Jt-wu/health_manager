@@ -1,5 +1,6 @@
 const api = require('../../services/api')
 const store = require('../../utils/store')
+const { formatDateTime } = require('../../utils/date')
 
 Page({
   data: {
@@ -42,7 +43,7 @@ Page({
     const meal = {
       mealId: `m_${Date.now()}`,
       userId: (store.getUser() || {}).openid,
-      time: new Date().toISOString(),
+      time: formatDateTime(),
       mealType,
       imageUrl: this.data.imageUrl,
       summary: this.data.summary,

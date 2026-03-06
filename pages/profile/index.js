@@ -1,4 +1,5 @@
 const store = require('../../utils/store')
+const { formatDateTime } = require('../../utils/date')
 
 Page({
   data: { profile: {}, plusStatus: false, metricValue: '' },
@@ -11,7 +12,7 @@ Page({
   onMetricInput(e) { this.setData({ metricValue: e.detail.value }) },
   saveWeight() {
     if (!this.data.metricValue) return wx.showToast({ title: '请输入体重', icon: 'none' })
-    store.addMetric({ type: 'weight', value: this.data.metricValue, measuredAt: new Date().toISOString() })
+    store.addMetric({ type: 'weight', value: this.data.metricValue, measuredAt: formatDateTime() })
     wx.showToast({ title: '已保存' })
     if (Number(this.data.metricValue) > 200 || Number(this.data.metricValue) < 20) {
       wx.showModal({ title: '提示', content: '指标异常，请咨询医生', showCancel: false })
