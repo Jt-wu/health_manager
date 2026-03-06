@@ -9,6 +9,10 @@ Page({
     const meals = store.getMeals().filter((m) => extractDate(m.time) === this.data.date)
     this.setData({ meals })
   },
+  openMeal(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/meal-detail/index?mealId=${encodeURIComponent(id)}` })
+  },
   copyMeal(e) {
     const id = e.currentTarget.dataset.id
     const target = store.getMeals().find((m) => m.mealId === id)

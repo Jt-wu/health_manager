@@ -9,14 +9,17 @@ Page({
     dishes: [],
     summary: { kcal: 0, sodium: 0 },
     conclusion: '',
-    advice: []
+    advice: [],
+    confidence: 0,
+    modelProvider: '',
+    confidencePercent: 0
   },
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
     this.setData({ imageUrl, loading: true })
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
-    this.setData({ ...result, loading: false })
+    this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}

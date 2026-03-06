@@ -7,6 +7,7 @@
       <view>总热量：{{summary.kcal}} kcal</view>
       <view>钠：{{summary.sodium}} mg</view>
       <view>结论：{{conclusion}}</view>
+      <view class="muted" wx:if="{{modelProvider}}">识别引擎：{{modelProvider}}（置信度：{{confidencePercent}}%）</view>
       <view wx:for="{{advice}}" wx:key="*this" class="muted">- {{item}}</view>
     </view>
 
