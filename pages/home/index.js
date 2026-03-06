@@ -10,6 +10,10 @@ Page({
     const kcal = meals.reduce((n, m) => n + (m.summary?.kcal || 0), 0)
     this.setData({ todayMeals: meals, todayKcal: kcal, primaryGoal: profile.primaryGoal || '' })
   },
+  openMeal(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({ url: `/pages/meal-detail/index?mealId=${encodeURIComponent(id)}` })
+  },
   goCapture() {
     const p = store.getProfile()
     if (!p || !p.height || !p.weight || !p.primaryGoal) {
