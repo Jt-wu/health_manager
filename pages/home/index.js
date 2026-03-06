@@ -1,11 +1,12 @@
 const store = require('../../utils/store')
+const { formatDate, extractDate } = require('../../utils/date')
 
 Page({
   data: { todayMeals: [], todayKcal: 0, primaryGoal: '' },
   onShow() {
     const profile = store.getProfile() || {}
-    const date = new Date().toISOString().slice(0, 10)
-    const meals = store.getMeals().filter((m) => (m.time || '').slice(0, 10) === date)
+    const date = formatDate()
+    const meals = store.getMeals().filter((m) => extractDate(m.time) === date)
     const kcal = meals.reduce((n, m) => n + (m.summary?.kcal || 0), 0)
     this.setData({ todayMeals: meals, todayKcal: kcal, primaryGoal: profile.primaryGoal || '' })
   },
