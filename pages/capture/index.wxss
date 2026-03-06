@@ -1,0 +1,6 @@
+.meal-type-picker {
+  padding: 16rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+  color: #334155;
+}

@@ -4,6 +4,7 @@
   <block wx:else>
     <view class="card">
       <view class="section-title">本餐汇总</view>
+      <view>餐别：{{mealType || '未选择（将按时间自动判断）'}}</view>
       <view>总热量：{{summary.kcal}} kcal</view>
       <view>钠：{{summary.sodium}} mg</view>
       <view>结论：{{conclusion}}</view>
@@ -12,11 +13,18 @@
     </view>
 
     <view class="card">
-      <view class="section-title">菜品列表</view>
-      <view wx:for="{{dishes}}" wx:key="id" style="border-bottom:1px solid #f1f5f9;padding:12rpx 0;">
-        <view>{{item.name}}（{{item.cookMethod}}）</view>
+      <view class="section-title">菜品列表（可修改）</view>
+      <view wx:for="{{dishes}}" wx:key="id" class="dish-item">
+        <view class="editor-label">菜品名称</view>
+        <input class="dish-input" value="{{item.name}}" data-id="{{item.id}}" bindblur="onDishNameInput" placeholder="请输入菜名" />
+
+        <view class="editor-label" style="margin-top:10rpx;">烹饪方式</view>
+        <picker mode="selector" range="{{cookMethods}}" value="{{item.cookMethodIndex}}" data-id="{{item.id}}" bindchange="onCookMethodChange">
+          <view class="cook-picker">{{item.cookMethod || '请选择烹饪方式'}}</view>
+        </picker>
+
         <view class="muted">份量：{{item.finalGrams}}g（自动：{{item.baseGrams}}g）</view>
-        <view style="display:flex; gap:12rpx; margin-top:8rpx;">
+        <view style="display:flex; gap:12rpx; margin-top:8rpx; flex-wrap: wrap;">
           <button size="mini" data-id="{{item.id}}" data-size="small" bindtap="adjustSize">小(0.75x)</button>
           <button size="mini" data-id="{{item.id}}" data-size="medium" bindtap="adjustSize">中(1x)</button>
           <button size="mini" data-id="{{item.id}}" data-size="large" bindtap="adjustSize">大(1.3x)</button>
