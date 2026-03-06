@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">本周概览</view>
+    <view>记录天数：{{report.recordedDays || 0}}</view>
+    <view>能量达标率：{{report.energyTargetRate || 0}}%</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">主目标3指标（{{primaryGoal}}）</view>
+    <view wx:for="{{report.metrics}}" wx:key="name">{{item.name}}：{{item.value}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">下周建议</view>
+    <view wx:for="{{report.advice}}" wx:key="*this" class="muted">- {{item}}</view>
+  </view>
+
+  <view class="card" wx:if="{{plusStatus}}">
+    <view class="section-title">Plus 深度洞察</view>
+    <view>Top来源：{{report.insights.topSources.join('、')}}</view>
+    <view>晚餐风险占比：{{report.insights.riskDistribution.dinner}}%</view>
+  </view>
+  <view class="card" wx:else>
+    <view class="muted">升级 Plus 解锁深度洞察</view>
+  </view>
+</view>
