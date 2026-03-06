@@ -1,6 +1,6 @@
 const api = require('../../services/api')
 const store = require('../../utils/store')
-const { formatDateTime } = require('../../utils/date')
+const { formatDate } = require('../../utils/date')
 
 const COOK_METHODS = ['蒸', '煮', '炒', '煎', '炸', '凉拌', '烤', '汤']
 
@@ -9,6 +9,7 @@ Page({
     loading: true,
     imageUrl: '',
     mealType: '',
+    recordDate: formatDate(),
     dishes: [],
     summary: { kcal: 0, sodium: 0 },
     conclusion: '',
@@ -20,7 +21,8 @@ Page({
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
     const mealType = decodeURIComponent(query.mealType || '')
-    this.setData({ imageUrl, mealType, loading: true, cookMethods: COOK_METHODS })
+    const recordDate = decodeURIComponent(query.recordDate || '') || formatDate()
+    this.setData({ imageUrl, mealType, recordDate, loading: true, cookMethods: COOK_METHODS })
 
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
@@ -80,7 +82,7 @@ Page({
     const meal = {
       mealId: `m_${Date.now()}`,
       userId: (store.getUser() || {}).openid,
-      time: formatDateTime(),
+      time: this.buildMealTime(),
       mealType,
       imageUrl: this.data.imageUrl,
       summary: this.data.summary,
@@ -91,6 +93,12 @@ Page({
     await api.saveMeal({ meal })
     wx.showToast({ title: '保存成功' })
     setTimeout(() => wx.switchTab({ url: '/pages/home/index' }), 400)
+  },
+
+  buildMealTime() {
+    const now = new Date()
+    const timePart = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+    return `${this.data.recordDate} ${timePart}`
   },
   guessMealType() {
     const h = new Date().getHours()

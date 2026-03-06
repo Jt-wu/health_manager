@@ -5,6 +5,7 @@
     <view class="card">
       <view class="section-title">本餐汇总</view>
       <view>餐别：{{mealType || '未选择（将按时间自动判断）'}}</view>
+      <view>记录日期：{{recordDate}}</view>
       <view>总热量：{{summary.kcal}} kcal</view>
       <view>钠：{{summary.sodium}} mg</view>
       <view>结论：{{conclusion}}</view>

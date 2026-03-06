@@ -5,6 +5,10 @@
     <button class="btn-primary" bindtap="chooseImage" style="margin-top:20rpx;">拍照/相册选择</button>
     <view wx:if="{{imageUrl}}" style="margin-top:16rpx;">已选择：{{imageUrl}}</view>
 
+    <picker mode="date" value="{{recordDate}}" end="{{today}}" bindchange="onDateChange" style="margin-top:16rpx;">
+      <view class="meal-type-picker">记录日期：{{recordDate}}</view>
+    </picker>
+
     <picker mode="selector" range="{{mealTypes}}" value="{{mealTypeIndex}}" bindchange="onMealTypeChange" style="margin-top:16rpx;">
       <view class="meal-type-picker">餐别：{{mealTypeIndex >= 0 ? mealTypes[mealTypeIndex] : '请选择（可选）'}}</view>
     </picker>

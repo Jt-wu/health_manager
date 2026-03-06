@@ -11,8 +11,9 @@
 
   <view class="card" style="margin-top:20rpx;">
     <view class="section-title">今日餐次</view>
-    <view wx:for="{{todayMeals}}" wx:key="mealId" style="margin-top:10rpx;">
+    <view wx:for="{{todayMeals}}" wx:key="mealId" style="margin-top:10rpx;" data-id="{{item.mealId}}" bindtap="openMeal">
       <view>{{item.mealType}} · {{item.summary.kcal}} kcal · {{item.conclusion}}</view>
+      <view class="muted">点击查看详情</view>
     </view>
   </view>
 </view>
