@@ -35,7 +35,7 @@ function getDayLog(date) {
 }
 
 function getWeeklyReport({ week, primaryGoal }) {
-  const meals = store.getMeals()
+  const meals = store.getMeals().filter((meal) => isMealInWeek(meal, week))
   const days = new Set(meals.map((m) => (m.time || '').slice(0, 10)))
   const energyTargetRate = meals.length ? Math.min(100, Math.round(65 + meals.length * 3)) : 0
   const metrics = goalMetrics(primaryGoal, energyTargetRate)
@@ -50,6 +50,37 @@ function getWeeklyReport({ week, primaryGoal }) {
       riskDistribution: { dinner: 52, takeout: 48 }
     }
   })
+}
+
+function isMealInWeek(meal, week) {
+  const mealTime = parseDate(meal.time)
+  const weekAnchor = parseDate(week)
+  if (!mealTime || !weekAnchor) return false
+
+  const range = weekRange(weekAnchor)
+  return mealTime >= range.start && mealTime <= range.end
+}
+
+function weekRange(anchorDate) {
+  const start = new Date(anchorDate)
+  start.setHours(0, 0, 0, 0)
+
+  const day = start.getDay()
+  const diffToMonday = day === 0 ? 6 : day - 1
+  start.setDate(start.getDate() - diffToMonday)
+
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  end.setHours(23, 59, 59, 999)
+
+  return { start, end }
+}
+
+function parseDate(value) {
+  if (!value) return null
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T')
+  const date = new Date(normalized)
+  return Number.isNaN(date.getTime()) ? null : date
 }
 
 function calcSummary(dishes) {
