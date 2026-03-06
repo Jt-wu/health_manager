@@ -25,8 +25,16 @@ Page({
     this.setData({ imageUrl, mealType, recordDate, loading: true, cookMethods: COOK_METHODS })
 
     const profile = store.getProfile() || {}
-    const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
-    this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
+    try {
+      const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
+      this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
+      if (result.modelProvider === '本地兜底识别') {
+        wx.showToast({ title: '当前为兜底结果，请配置识别API', icon: 'none', duration: 2600 })
+      }
+    } catch (e) {
+      this.setData({ loading: false })
+      wx.showToast({ title: '识别失败，请检查API配置', icon: 'none' })
+    }
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
