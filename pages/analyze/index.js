@@ -15,7 +15,8 @@ Page({
     advice: [],
     confidence: 0,
     modelProvider: '',
-    confidencePercent: 0
+    confidencePercent: 0,
+    cookMethods: COOK_METHODS
   },
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
@@ -26,8 +27,6 @@ Page({
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
     this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
 
-    const dishes = (result.dishes || []).map((d) => ({ ...d, cookMethodIndex: this.getCookMethodIndex(d.cookMethod) }))
-    this.setData({ dishes, mealType: mealType || this.data.mealType, cookMethods: COOK_METHODS })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
