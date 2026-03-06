@@ -1,7 +1,15 @@
 const store = require('../utils/store')
 const { extractDate } = require('../utils/date')
 
-const VLM_ANALYZE_ENDPOINT = 'https://example.com/api/v1/vision/analyzeMeal'
+let visionConfig = {}
+try {
+  // eslint-disable-next-line global-require
+  visionConfig = require('./vision.config')
+} catch (e) {
+  visionConfig = {}
+}
+
+const DEFAULT_ANALYZE_PATH = '/api/v1/vision/analyzeMeal'
 
 function fakeDelay(data, delay = 300) {
   return new Promise((resolve) => setTimeout(() => resolve(data), delay))
@@ -12,38 +20,129 @@ function analyzeMeal({ imageUrl, primaryGoal }) {
 }
 
 function analyzeMealByVisionModel({ imageUrl, primaryGoal }) {
+  const endpoint = buildAnalyzeEndpoint()
+  if (!endpoint) {
+    return Promise.reject(new Error('vision_config_missing'))
+  }
+
+  const payload = {
+    primaryGoal,
+    model: 'gpt-4.1-vision',
+    scene: 'meal_multi_dish'
+  }
+
+  const headers = buildAuthHeader()
+  const isRemoteImage = /^https?:\/\//.test(imageUrl)
+
+  if (isRemoteImage) {
+    return requestAnalyzeByJson({ endpoint, payload: { ...payload, imageUrl }, headers, imageUrl, primaryGoal })
+  }
+
+  return uploadAnalyzeByFile({ endpoint, payload, headers, imageUrl, primaryGoal })
+}
+
+function requestAnalyzeByJson({ endpoint, payload, headers, imageUrl, primaryGoal }) {
   return new Promise((resolve, reject) => {
     wx.request({
-      url: VLM_ANALYZE_ENDPOINT,
+      url: endpoint,
       method: 'POST',
-      timeout: 12000,
-      data: {
-        imageUrl,
-        primaryGoal,
-        model: 'gpt-4.1-vision',
-        scene: 'meal_multi_dish'
-      },
+      timeout: 15000,
+      header: headers,
+      data: payload,
       success: (res) => {
-        const data = res.data || {}
-        if (res.statusCode >= 200 && res.statusCode < 300 && Array.isArray(data.dishes)) {
-          const dishes = data.dishes.map(normalizeDish)
-          const summary = data.summary || calcSummary(dishes)
-          resolve({
-            dishes,
-            summary,
-            conclusion: data.conclusion || buildConclusion(summary, primaryGoal),
-            advice: data.advice || buildAdvice(summary, primaryGoal),
-            confidence: data.confidence || 0,
-            imageUrl,
-            modelProvider: data.modelProvider || '视觉大模型'
-          })
-          return
+        try {
+          resolve(normalizeAnalyzeResult(res.data, imageUrl, primaryGoal))
+        } catch (e) {
+          reject(e)
         }
-        reject(new Error('invalid_vlm_response'))
       },
       fail: reject
     })
   })
+}
+
+function uploadAnalyzeByFile({ endpoint, payload, headers, imageUrl, primaryGoal }) {
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: endpoint,
+      filePath: imageUrl,
+      name: visionConfig.uploadFieldName || 'file',
+      formData: payload,
+      header: headers,
+      timeout: 20000,
+      success: (res) => {
+        try {
+          const parsedData = parseUploadData(res.data)
+          resolve(normalizeAnalyzeResult(parsedData, imageUrl, primaryGoal))
+        } catch (e) {
+          reject(e)
+        }
+      },
+      fail: reject
+    })
+  })
+}
+
+function parseUploadData(raw) {
+  if (!raw) return {}
+  if (typeof raw === 'object') return raw
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw)
+    } catch (e) {
+      throw new Error('invalid_upload_json')
+    }
+  }
+  return {}
+}
+
+function normalizeAnalyzeResult(rawData, imageUrl, primaryGoal) {
+  const body = rawData?.data || rawData?.result || rawData || {}
+  const dishList = Array.isArray(body.dishes) ? body.dishes : []
+  if (!dishList.length) {
+    throw new Error('invalid_vlm_response')
+  }
+
+  const dishes = dishList.map(normalizeDish)
+  const summary = normalizeSummary(body.summary, dishes)
+
+  return {
+    dishes,
+    summary,
+    conclusion: body.conclusion || buildConclusion(summary, primaryGoal),
+    advice: Array.isArray(body.advice) ? body.advice : buildAdvice(summary, primaryGoal),
+    confidence: Number(body.confidence || body.score || 0),
+    imageUrl,
+    modelProvider: body.modelProvider || body.provider || '视觉识别引擎'
+  }
+}
+
+function normalizeSummary(inputSummary, dishes) {
+  if (inputSummary && typeof inputSummary === 'object') {
+    return {
+      kcal: Number(inputSummary.kcal || inputSummary.energy || 0),
+      sodium: Number(inputSummary.sodium || inputSummary.salt || 0),
+      protein: Number(inputSummary.protein || 0)
+    }
+  }
+  return calcSummary(dishes)
+}
+
+function buildAnalyzeEndpoint() {
+  const baseUrl = (visionConfig.baseUrl || '').replace(/\/$/, '')
+  const analyzePath = visionConfig.analyzePath || DEFAULT_ANALYZE_PATH
+  if (!baseUrl) return ''
+  return `${baseUrl}${analyzePath}`
+}
+
+function buildAuthHeader() {
+  const header = {
+    'content-type': 'application/json'
+  }
+  if (visionConfig.apiKey) {
+    header.Authorization = `Bearer ${visionConfig.apiKey}`
+  }
+  return header
 }
 
 function analyzeMealFallback({ imageUrl, primaryGoal }) {
@@ -54,25 +153,30 @@ function analyzeMealFallback({ imageUrl, primaryGoal }) {
 
   const summary = calcSummary(dishes)
   const conclusion = buildConclusion(summary, primaryGoal)
-  const advice = buildAdvice(summary, primaryGoal)
+  const advice = [
+    '当前为离线兜底结果，可能不准确',
+    '请先完成视觉识别 API 配置后再使用拍照识别',
+    ...buildAdvice(summary, primaryGoal)
+  ]
 
-  return fakeDelay({ dishes, summary, conclusion, advice, confidence: 0.84, imageUrl, modelProvider: '本地兜底识别' }, 800)
+  return fakeDelay({ dishes, summary, conclusion, advice, confidence: 0.2, imageUrl, modelProvider: '本地兜底识别' }, 500)
 }
 
 function normalizeDish(d, index) {
-  const baseGrams = Number(d.baseGrams || d.finalGrams || 100)
+  const baseGrams = Number(d.baseGrams || d.base_grams || d.finalGrams || d.grams || 100)
+  const nutrition = d.nutrition || {}
   return {
-    id: d.id || `d_${Date.now()}_${index}`,
-    name: d.name || '未命名菜品',
-    cookMethod: d.cookMethod || '未知',
+    id: d.id || d.dishId || `d_${Date.now()}_${index}`,
+    name: d.name || d.dishName || '未命名菜品',
+    cookMethod: d.cookMethod || d.cook_method || '未知',
     baseGrams,
-    finalGrams: Number(d.finalGrams || baseGrams),
-    adjustMethod: d.adjustMethod || 'auto',
-    confidence: Number(d.confidence || 0),
+    finalGrams: Number(d.finalGrams || d.final_grams || baseGrams),
+    adjustMethod: d.adjustMethod || d.adjust_method || 'auto',
+    confidence: Number(d.confidence || d.score || 0),
     nutrition: {
-      kcal: Number(d.nutrition?.kcal || 0),
-      sodium: Number(d.nutrition?.sodium || 0),
-      protein: Number(d.nutrition?.protein || 0)
+      kcal: Number(nutrition.kcal || nutrition.energy || d.kcal || 0),
+      sodium: Number(nutrition.sodium || nutrition.salt || d.sodium || 0),
+      protein: Number(nutrition.protein || d.protein || 0)
     }
   }
 }
