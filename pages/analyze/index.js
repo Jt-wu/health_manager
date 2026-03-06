@@ -24,8 +24,7 @@ Page({
 
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
-    const dishes = (result.dishes || []).map((d) => ({ ...d, cookMethodIndex: this.getCookMethodIndex(d.cookMethod) }))
-    this.setData({ ...result, dishes, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
+    this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
