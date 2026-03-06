@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="card">
+    <picker mode="date" value="{{date}}" bindchange="onDateChange"><view>日期：{{date}}</view></picker>
+  </view>
+
+  <view class="card" wx:for="{{meals}}" wx:key="mealId">
+    <view>{{item.mealType}} · {{item.summary.kcal}} kcal · {{item.conclusion}}</view>
+    <view class="muted">{{item.time}}</view>
+    <view style="display:flex; gap:12rpx; margin-top:10rpx;">
+      <button size="mini" data-id="{{item.mealId}}" bindtap="viewMeal">查看</button>
+      <button size="mini" data-id="{{item.mealId}}" bindtap="copyMeal">复制</button>
+      <button size="mini" data-id="{{item.mealId}}" bindtap="deleteMeal">删除</button>
+    </view>
+  </view>
+</view>
