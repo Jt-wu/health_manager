@@ -22,10 +22,19 @@ Page({
     const imageUrl = decodeURIComponent(query.imageUrl || '')
     const mealType = decodeURIComponent(query.mealType || '')
     this.setData({ imageUrl, mealType, loading: true })
+
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
+    const viewData = this.normalizeAnalyzeResult(result)
+    this.setData({ ...viewData, mealType: mealType || this.data.mealType, loading: false })
+  },
+  normalizeAnalyzeResult(result = {}) {
     const dishes = (result.dishes || []).map((d) => ({ ...d, cookMethodIndex: this.getCookMethodIndex(d.cookMethod) }))
-    this.setData({ ...result, dishes, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
+    return {
+      ...result,
+      dishes,
+      confidencePercent: Math.round((result.confidence || 0) * 100)
+    }
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
@@ -62,7 +71,16 @@ Page({
     this.recalc(dishes)
   },
   addDish() {
-    const dish = { id: `n_${Date.now()}`, name: '新增菜品', cookMethod: '炒', cookMethodIndex: this.getCookMethodIndex('炒'), baseGrams: 100, finalGrams: 100, adjustMethod: 'auto', nutrition: { kcal: 140, sodium: 120, protein: 8 } }
+    const dish = {
+      id: `n_${Date.now()}`,
+      name: '新增菜品',
+      cookMethod: '炒',
+      cookMethodIndex: this.getCookMethodIndex('炒'),
+      baseGrams: 100,
+      finalGrams: 100,
+      adjustMethod: 'auto',
+      nutrition: { kcal: 140, sodium: 120, protein: 8 }
+    }
     this.recalc([dish, ...this.data.dishes])
   },
   async saveMeal() {
