@@ -15,7 +15,7 @@
         <view
           wx:for="{{goalOptions}}"
           wx:key="*this"
-          class="goal-item {{form.goals.includes(item) ? 'goal-item--active' : ''}}"
+          class="goal-item {{goalSelectedMap[item] ? 'goal-item--active' : ''}}"
           data-goal="{{item}}"
           bindtap="toggleGoal"
         >

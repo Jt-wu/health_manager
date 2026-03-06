@@ -11,6 +11,13 @@ function normalizeList(value) {
     .filter(Boolean)
 }
 
+
+function buildGoalSelectedMap(goals) {
+  return (goals || []).reduce((acc, goal) => {
+    acc[goal] = true
+    return acc
+  }, {})
+}
 Page({
   data: {
     step: 1,
@@ -20,7 +27,8 @@ Page({
     form: {
       height: '', weight: '', sex: '', activity_level: '', goals: [], primaryGoal: '',
       bp: '', ua: '', lipid: '', allergiesText: '', avoidFoodsText: ''
-    }
+    },
+    goalSelectedMap: {}
   },
   onLoad() {
     const profile = store.getProfile()
@@ -44,7 +52,8 @@ Page({
         lipid: profile.lipid || '',
         allergiesText: normalizeList(profile.allergies).join(','),
         avoidFoodsText: normalizeList(profile.avoid_foods).join(',')
-      }
+      },
+      goalSelectedMap: buildGoalSelectedMap(goals)
     })
   },
   onInput(e) {
@@ -59,7 +68,11 @@ Page({
     const exists = currentGoals.includes(goal)
     const goals = exists ? currentGoals.filter((item) => item !== goal) : [...currentGoals, goal]
     const primaryGoal = goals.includes(this.data.form.primaryGoal) ? this.data.form.primaryGoal : (goals[0] || '')
-    this.setData({ 'form.goals': goals, 'form.primaryGoal': primaryGoal })
+    this.setData({
+      'form.goals': goals,
+      'form.primaryGoal': primaryGoal,
+      goalSelectedMap: buildGoalSelectedMap(goals)
+    })
   },
   onPrimaryGoalChange(e) { this.setData({ 'form.primaryGoal': this.data.form.goals[e.detail.value] || '' }) },
   skipMetric() { wx.showToast({ title: '已标记稍后补充', icon: 'none' }) },
