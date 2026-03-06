@@ -15,8 +15,7 @@ Page({
     advice: [],
     confidence: 0,
     modelProvider: '',
-    confidencePercent: 0,
-    cookMethods: COOK_METHODS
+    confidencePercent: 0
   },
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
@@ -27,6 +26,9 @@ Page({
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
     this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
 
+  },
+  onReady() {
+    this.setData({ cookMethods: COOK_METHODS })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}

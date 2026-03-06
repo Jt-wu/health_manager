@@ -2,7 +2,6 @@ const store = require('../utils/store')
 const { extractDate } = require('../utils/date')
 
 const VLM_ANALYZE_ENDPOINT = 'https://example.com/api/v1/vision/analyzeMeal'
-const COOK_METHODS = ['蒸', '煮', '炒', '煎', '炸', '凉拌', '烤', '汤']
 
 function fakeDelay(data, delay = 300) {
   return new Promise((resolve) => setTimeout(() => resolve(data), delay))
@@ -51,7 +50,7 @@ function analyzeMealFallback({ imageUrl, primaryGoal }) {
   const dishes = [
     { id: `d_${Date.now()}_1`, name: '西红柿炒蛋', cookMethod: '炒', baseGrams: 180, finalGrams: 180, adjustMethod: 'auto', confidence: 0.86, nutrition: { kcal: 220, sodium: 420, protein: 12 } },
     { id: `d_${Date.now()}_2`, name: '米饭', cookMethod: '蒸', baseGrams: 150, finalGrams: 150, adjustMethod: 'auto', confidence: 0.93, nutrition: { kcal: 170, sodium: 5, protein: 3 } }
-  ].map(normalizeDish)
+  ]
 
   const summary = calcSummary(dishes)
   const conclusion = buildConclusion(summary, primaryGoal)
@@ -66,7 +65,6 @@ function normalizeDish(d, index) {
     id: d.id || `d_${Date.now()}_${index}`,
     name: d.name || '未命名菜品',
     cookMethod: d.cookMethod || '未知',
-    cookMethodIndex: getCookMethodIndex(d.cookMethod),
     baseGrams,
     finalGrams: Number(d.finalGrams || baseGrams),
     adjustMethod: d.adjustMethod || 'auto',
@@ -79,10 +77,6 @@ function normalizeDish(d, index) {
   }
 }
 
-function getCookMethodIndex(method) {
-  const idx = COOK_METHODS.indexOf(method)
-  return idx >= 0 ? idx : 0
-}
 
 function recalcMeal({ dishes, primaryGoal }) {
   const summary = calcSummary(dishes)
