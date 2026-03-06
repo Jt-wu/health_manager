@@ -20,15 +20,12 @@ Page({
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
     const mealType = decodeURIComponent(query.mealType || '')
-    this.setData({ imageUrl, mealType, loading: true })
+    this.setData({ imageUrl, mealType, loading: true, cookMethods: COOK_METHODS })
 
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
     this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
 
-  },
-  onReady() {
-    this.setData({ cookMethods: COOK_METHODS })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
