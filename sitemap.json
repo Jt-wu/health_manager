@@ -1,3 +1,9 @@
 {
-  "rules": []
+  "desc": "健康管理小程序 sitemap 配置",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
 }

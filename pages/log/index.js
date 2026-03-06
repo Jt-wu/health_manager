@@ -1,11 +1,12 @@
 const store = require('../../utils/store')
+const { formatDateKey, getLocalDayKey } = require('../../utils/date')
 
 Page({
-  data: { date: new Date().toISOString().slice(0, 10), meals: [] },
+  data: { date: formatDateKey(), meals: [] },
   onShow() { this.loadMeals() },
   onDateChange(e) { this.setData({ date: e.detail.value }); this.loadMeals() },
   loadMeals() {
-    const meals = store.getMeals().filter((m) => (m.time || '').slice(0, 10) === this.data.date)
+    const meals = store.getMeals().filter((m) => getLocalDayKey(m.time) === this.data.date)
     this.setData({ meals })
   },
   copyMeal(e) {
