@@ -1,5 +1,6 @@
 const api = require('../../services/api')
 const store = require('../../utils/store')
+const { formatDate } = require('../../utils/date')
 
 Page({
   data: { report: { metrics: [], advice: [], insights: { topSources: [], riskDistribution: {} } }, primaryGoal: '', plusStatus: false },
@@ -11,6 +12,6 @@ Page({
     this.setData({ report, primaryGoal: profile.primaryGoal || '未设置', plusStatus: !!user.plusStatus })
   },
   currentWeek() {
-    return `${new Date().toISOString().slice(0, 10)}`
+    return formatDate()
   }
 })
