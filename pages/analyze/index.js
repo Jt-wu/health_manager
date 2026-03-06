@@ -15,8 +15,7 @@ Page({
     advice: [],
     confidence: 0,
     modelProvider: '',
-    confidencePercent: 0,
-    cookMethods: COOK_METHODS
+    confidencePercent: 0
   },
   async onLoad(query) {
     const imageUrl = decodeURIComponent(query.imageUrl || '')
@@ -25,14 +24,10 @@ Page({
 
     const profile = store.getProfile() || {}
     const result = await api.analyzeMeal({ imageUrl, primaryGoal: profile.primaryGoal })
+    this.setData({ ...result, confidencePercent: Math.round((result.confidence || 0) * 100), loading: false })
+
     const dishes = (result.dishes || []).map((d) => ({ ...d, cookMethodIndex: this.getCookMethodIndex(d.cookMethod) }))
-    this.setData({
-      ...result,
-      dishes,
-      mealType: mealType || this.data.mealType,
-      confidencePercent: Math.round((result.confidence || 0) * 100),
-      loading: false
-    })
+    this.setData({ dishes, mealType: mealType || this.data.mealType, cookMethods: COOK_METHODS })
   },
   async recalc(dishes) {
     const profile = store.getProfile() || {}
@@ -40,7 +35,8 @@ Page({
     this.setData({ dishes, summary: res.summary, conclusion: res.conclusion, advice: res.advice })
   },
   getCookMethodIndex(method) {
-    const idx = this.data.cookMethods.indexOf(method)
+    const methodList = this.data.cookMethods || COOK_METHODS
+    const idx = methodList.indexOf(method)
     return idx >= 0 ? idx : 0
   },
   updateDishById(id, updater) {
@@ -54,7 +50,8 @@ Page({
   },
   onCookMethodChange(e) {
     const { id } = e.currentTarget.dataset
-    const cookMethod = this.data.cookMethods[Number(e.detail.value)]
+    const methodList = this.data.cookMethods || COOK_METHODS
+    const cookMethod = methodList[Number(e.detail.value)]
     this.updateDishById(id, (d) => ({ ...d, cookMethod, cookMethodIndex: Number(e.detail.value) }))
   },
   adjustSize(e) {
