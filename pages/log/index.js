@@ -1,5 +1,5 @@
 const store = require('../../utils/store')
-const { formatDate, extractDate } = require('../../utils/date')
+const { formatDate, formatDateTime, extractDate } = require('../../utils/date')
 
 Page({
   data: { date: formatDate(), meals: [] },
@@ -13,7 +13,7 @@ Page({
     const id = e.currentTarget.dataset.id
     const target = store.getMeals().find((m) => m.mealId === id)
     if (!target) return
-    const copied = { ...target, mealId: `m_${Date.now()}`, time: new Date().toISOString() }
+    const copied = { ...target, mealId: `m_${Date.now()}`, time: formatDateTime() }
     store.addMeal(copied)
     wx.showToast({ title: '已复制到当天' })
     this.loadMeals()

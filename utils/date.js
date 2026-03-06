@@ -8,6 +8,11 @@ function formatDate(date = new Date()) {
 }
 
 
+function formatDateTime(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date)
+  return `${formatDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
 function extractDate(value) {
   if (!value) return ''
   if (/^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10)
@@ -16,4 +21,4 @@ function extractDate(value) {
   return formatDate(d)
 }
 
-module.exports = { formatDate, extractDate }
+module.exports = { formatDate, formatDateTime, extractDate }
