@@ -11,9 +11,17 @@
 
     <block wx:elif="{{step===2}}">
       <view class="muted">至少选择一个目标，并选择一个主目标</view>
-      <checkbox-group bindchange="onGoalChange">
-        <label wx:for="{{goalOptions}}" wx:key="*this"><checkbox value="{{item}}" checked="{{form.goals.includes(item)}}"/>{{item}}</label>
-      </checkbox-group>
+      <view class="goal-list">
+        <view
+          wx:for="{{goalOptions}}"
+          wx:key="*this"
+          class="goal-item {{form.goals.includes(item) ? 'goal-item--active' : ''}}"
+          data-goal="{{item}}"
+          bindtap="toggleGoal"
+        >
+          {{item}}
+        </view>
+      </view>
       <picker mode="selector" range="{{form.goals}}" bindchange="onPrimaryGoalChange">
         <view>主目标：{{form.primaryGoal || '请选择'}}</view>
       </picker>
