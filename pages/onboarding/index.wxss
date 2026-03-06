@@ -22,7 +22,8 @@ input, picker view {
 }
 
 .goal-item--active {
-  border-color: #2563eb;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
 }
